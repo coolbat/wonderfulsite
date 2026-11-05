@@ -311,6 +311,9 @@ h1 a {
   scroll-margin-top: 8rem;
   overflow: hidden;
   text-decoration: none;
+  content-visibility: auto;
+  contain-intrinsic-size: 300px;
+  contain-intrinsic-size: auto 300px;
   transition: border-color 160ms ease, transform 160ms ease;
 }
 
@@ -319,16 +322,82 @@ h1 a {
   transform: translateY(-2px);
 }
 
+.preview {
+  --preview-h: 172px;
+  --pan-duration: 26s;
+  position: relative;
+  height: var(--preview-h);
+  overflow: hidden;
+  background: #111;
+  border-bottom: 1px solid var(--border);
+}
+
+.preview-detail {
+  --preview-h: 440px;
+  --pan-duration: 36s;
+  width: min(100%, 720px);
+  margin-bottom: 1.5rem;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+}
+
 .mark {
   display: grid;
   place-items: center;
-  height: 148px;
   background: #111;
-  border-bottom: 1px solid var(--border);
-  border-radius: var(--radius) var(--radius) 0 0;
   font-family: var(--serif);
   font-size: 3.25rem;
   line-height: 1;
+}
+
+.preview .mark {
+  position: absolute;
+  inset: 0;
+}
+
+.preview-detail .mark {
+  border-radius: inherit;
+  font-size: 5.5rem;
+}
+
+.preview-pan {
+  position: relative;
+  z-index: 1;
+  transform-origin: center top;
+  animation: preview-pan var(--pan-duration) cubic-bezier(0.45, 0.05, 0.55, 0.95) infinite alternate;
+  animation-delay: calc(var(--pan-offset, 0) * -1s);
+}
+
+.preview-shot {
+  display: block;
+  width: 100%;
+  height: auto;
+  min-height: var(--preview-h);
+  object-fit: cover;
+  object-position: top center;
+  transition: opacity 180ms ease;
+}
+
+html.preview-js .preview:not(.is-ready) .preview-pan {
+  animation: none;
+}
+
+html.preview-js .preview:not(.is-ready) .preview-shot {
+  opacity: 0;
+}
+
+.preview.is-fallback .preview-pan {
+  visibility: hidden;
+  animation: none;
+}
+
+@keyframes preview-pan {
+  from {
+    transform: translate3d(0, 0, 0) scale(1);
+  }
+  to {
+    transform: translate3d(0, calc(-100% + var(--preview-h)), 0) scale(1.03);
+  }
 }
 
 .card-body {
@@ -393,19 +462,6 @@ h1 a {
 
 .crumb a {
   color: var(--fg);
-}
-
-.detail-mark {
-  display: grid;
-  place-items: center;
-  width: min(100%, 720px);
-  height: 220px;
-  margin-bottom: 1.5rem;
-  background: #111;
-  border: 1px solid var(--border);
-  border-radius: var(--radius);
-  font-family: var(--serif);
-  font-size: 5.5rem;
 }
 
 .detail h1 {
@@ -580,10 +636,18 @@ blockquote {
     border-top: 1px solid var(--border);
   }
 
-  .detail-mark {
-    height: 160px;
+  .preview-detail {
+    --preview-h: 260px;
+  }
+
+  .preview-detail .mark {
     font-size: 4rem;
   }
+}
+
+.card:hover .preview-pan,
+.preview-detail:hover .preview-pan {
+  animation-duration: 11s;
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -593,5 +657,16 @@ blockquote {
 
   .card:hover {
     transform: none;
+  }
+
+  .preview-pan,
+  .card:hover .preview-pan,
+  .preview-detail:hover .preview-pan {
+    animation: none;
+    transform: none;
+  }
+
+  .preview-shot {
+    transition: none;
   }
 }

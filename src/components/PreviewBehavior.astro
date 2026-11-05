@@ -1,0 +1,79 @@
+<script is:inline>
+  (function () {
+    var MIN_WIDTH = 500;
+    var RETRY_MS = 2800;
+    document.documentElement.classList.add("preview-js");
+
+    function shot(target) {
+      if (!target || !target.classList || !target.classList.contains("preview-shot")) return null;
+      return target;
+    }
+
+    function mark(img, ready) {
+      var preview = img.closest(".preview");
+      if (!preview) return;
+      preview.classList.toggle("is-ready", ready);
+      preview.classList.toggle("is-fallback", !ready);
+    }
+
+    function realShot(img) {
+      if (!img.naturalWidth) return false;
+      if (img.getAttribute("data-kind") === "local") return true;
+      return img.naturalWidth >= MIN_WIDTH;
+    }
+
+    function scheduleRetry(img) {
+      if (img.getAttribute("data-kind") === "local") return;
+      if (img.getAttribute("data-retried") === "1") return;
+
+      var run = function () {
+        if (img.getAttribute("data-retried") === "1") return;
+        img.setAttribute("data-retried", "1");
+        var src = img.getAttribute("src");
+        if (!src) return;
+        window.setTimeout(function () {
+          var next = src + (src.indexOf("?") === -1 ? "?" : "&") + "v=2";
+          img.setAttribute("src", next);
+        }, RETRY_MS);
+      };
+
+      if (!("IntersectionObserver" in window)) {
+        run();
+        return;
+      }
+
+      var observer = new IntersectionObserver(
+        function (entries) {
+          if (!entries.some(function (entry) { return entry.isIntersecting; })) return;
+          observer.disconnect();
+          run();
+        },
+        { rootMargin: "240px 0px" },
+      );
+      observer.observe(img.closest(".preview") || img);
+    }
+
+    document.addEventListener(
+      "load",
+      function (event) {
+        var img = shot(event.target);
+        if (!img) return;
+        var ready = realShot(img);
+        mark(img, ready);
+        if (!ready) scheduleRetry(img);
+      },
+      true,
+    );
+
+    document.addEventListener(
+      "error",
+      function (event) {
+        var img = shot(event.target);
+        if (!img) return;
+        mark(img, false);
+        scheduleRetry(img);
+      },
+      true,
+    );
+  })();
+</script>

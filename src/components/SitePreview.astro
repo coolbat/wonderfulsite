@@ -1,0 +1,31 @@
+---
+import { initialFor, type Site } from "../lib/sites";
+import { previewPanOffset, previewUrl } from "../lib/preview";
+
+interface Props {
+  site: Site;
+  size?: "card" | "detail";
+}
+
+const { site, size = "card" } = Astro.props;
+const src = previewUrl(site.url, site.domain);
+const detail = size === "detail";
+const offset = previewPanOffset(site.domain);
+---
+
+<div class:list={["preview", detail && "preview-detail"]} style={`--pan-offset: ${offset}`}>
+  <div class="mark" aria-hidden="true">{initialFor(site.domain)}</div>
+  <div class="preview-pan">
+    <img
+      class="preview-shot"
+      src={src}
+      alt={detail ? `Screenshot of ${site.domain}` : ""}
+      width="640"
+      height="960"
+      loading={detail ? "eager" : "lazy"}
+      decoding="async"
+      fetchpriority={detail ? "high" : "low"}
+      data-kind={src.startsWith("/") ? "local" : "remote"}
+    />
+  </div>
+</div>
