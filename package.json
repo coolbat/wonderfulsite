@@ -1,0 +1,23 @@
+{
+  "name": "wonderfulsite",
+  "version": "1.0.0",
+  "private": true,
+  "description": "A gallery of personal websites shared in replies to two public posts by @zarazhangrui.",
+  "type": "module",
+  "packageManager": "pnpm@10.33.4",
+  "engines": {
+    "node": ">=22.23.4"
+  },
+  "scripts": {
+    "dev": "astro dev",
+    "build": "ASTRO_TELEMETRY_DISABLED=1 node scripts/check-data.mjs && ASTRO_TELEMETRY_DISABLED=1 astro build",
+    "check": "node scripts/check-data.mjs"
+  },
+  "dependencies": {
+    "@astrojs/sitemap": "^3.7.4",
+    "@fontsource-variable/geist": "^5.3.0",
+    "@fontsource/geist-mono": "^5.3.0",
+    "@fontsource/libre-baskerville": "^5.3.0",
+    "astro": "^7.4.5"
+  }
+}

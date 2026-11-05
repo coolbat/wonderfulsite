@@ -1,0 +1,55 @@
+---
+import Base from "../layouts/Base.astro";
+import ExternalLink from "../components/ExternalLink.astro";
+import { THREADS, counts } from "../lib/sites";
+
+const description =
+  "WonderfulSite is an unofficial gallery of personal websites taken from two public posts by @zarazhangrui.";
+const resume = THREADS["2113148949842534482"];
+const coolest = THREADS["2108047745936466373"];
+const excerptSentence =
+  counts.withoutExcerpt === 1
+    ? "1 entry has no excerpt."
+    : `${counts.withoutExcerpt} entries have no excerpt.`;
+---
+
+<Base title="About" description={description}>
+  <article class="shell prose">
+    <h1>About</h1>
+    <p>
+      WonderfulSite is an unofficial gallery of personal websites. The entries come from links in
+      replies to two public posts by <ExternalLink href="https://x.com/zarazhangrui">@zarazhangrui</ExternalLink>.
+    </p>
+
+    <h2>Source conversations</h2>
+    <ul class="source-list">
+      <li>
+        <ExternalLink href={resume.href}>{resume.title}</ExternalLink>
+        <p>{counts.resume} sites in this gallery come from that conversation.</p>
+      </li>
+      <li>
+        <ExternalLink href={coolest.href}>{coolest.title}</ExternalLink>
+        <p>{counts.coolest} sites in this gallery come from that conversation.</p>
+      </li>
+    </ul>
+
+    <h2>Entries</h2>
+    <p>
+      {`Each entry shows the domain, the site URL, the reply author, the like count recorded for that reply, and the conversation the reply belongs to. An excerpt is shown when the entry has one. ${excerptSentence}`}
+    </p>
+
+    <h2>Unofficial</h2>
+    <p>
+      WonderfulSite is not affiliated with @zarazhangrui, with X, or with the authors of the listed
+      sites. A listing records that a link appeared in one of the two conversations. It is not an
+      endorsement of the site.
+    </p>
+
+    <h2>Removal</h2>
+    <p>
+      {`To request that a domain be removed, open an issue in the `}
+      <ExternalLink href="https://github.com/coolbat/wonderfulsite">wonderfulsite repository</ExternalLink>
+      {` and name the domain.`}
+    </p>
+  </article>
+</Base>

@@ -1,0 +1,79 @@
+---
+import Base from "../../layouts/Base.astro";
+import ExternalLink from "../../components/ExternalLink.astro";
+import {
+  formatLikes,
+  initialFor,
+  replyHref,
+  authorHref,
+  sites,
+  threadFor,
+  type Site,
+} from "../../lib/sites";
+
+interface Props {
+  site: Site;
+}
+
+export function getStaticPaths() {
+  return sites.map((site) => ({
+    params: { domain: site.domain },
+    props: { site },
+  }));
+}
+
+const { site } = Astro.props;
+const thread = threadFor(site);
+const description = site.excerpt
+  ? `${site.excerpt} — ${site.domain}, from a reply by ${site.author}, ${formatLikes(site.likes)}.`
+  : `${site.domain}, from a reply by ${site.author}, ${formatLikes(site.likes)}.`;
+---
+
+<Base title={site.domain} description={description}>
+  <article class="shell detail">
+    <nav class="crumb" aria-label="Breadcrumb">
+      <a href="/">Gallery</a>
+      <span aria-hidden="true">/</span>
+      <span aria-current="page">{site.domain}</span>
+    </nav>
+
+    <div class="detail-mark" aria-hidden="true">{initialFor(site.domain)}</div>
+    <h1>{site.domain}</h1>
+    <p class="thread-line">
+      {thread.label} thread · <ExternalLink href={thread.href}>{thread.title}</ExternalLink>
+    </p>
+
+    <dl class="facts">
+      <div>
+        <dt>Reply author</dt>
+        <dd><ExternalLink href={authorHref(site.author)}>{site.author}</ExternalLink></dd>
+      </div>
+      <div>
+        <dt>Likes</dt>
+        <dd>
+          {formatLikes(site.likes)}
+        </dd>
+      </div>
+      <div>
+        <dt>Conversation</dt>
+        <dd><ExternalLink href={thread.href}>{thread.title}</ExternalLink></dd>
+      </div>
+      <div>
+        <dt>Source reply</dt>
+        <dd><ExternalLink href={replyHref(site)}>View the reply</ExternalLink></dd>
+      </div>
+    </dl>
+
+    <div class="actions">
+      <ExternalLink class="button primary" href={site.url}>Visit site</ExternalLink>
+      <ExternalLink class="button" href={replyHref(site)}>Source reply</ExternalLink>
+      <ExternalLink class="button" href={thread.href}>Conversation</ExternalLink>
+    </div>
+    <p class="url-line">{site.url}</p>
+
+    <section class="excerpt">
+      <h2>Excerpt</h2>
+      {site.excerpt ? <blockquote>{site.excerpt}</blockquote> : <p class="empty">No excerpt was recorded for this entry.</p>}
+    </section>
+  </article>
+</Base>
