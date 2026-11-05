@@ -1,0 +1,118 @@
+---
+import Base from "../layouts/Base.astro";
+import ExternalLink from "../components/ExternalLink.astro";
+import SiteCard from "../components/SiteCard.astro";
+import { THREADS, counts, sites } from "../lib/sites";
+
+const description =
+  "A gallery of 789 personal websites shared in replies to two public posts by @zarazhangrui.";
+const resume = THREADS["2113148949842534482"];
+const coolest = THREADS["2108047745936466373"];
+---
+
+<Base title="WonderfulSite" description={description}>
+  <div class="shell">
+    <section class="hero">
+      <p class="eyebrow">Personal site gallery</p>
+      <h1>
+        Personal websites shared in replies to two public posts by <ExternalLink href="https://x.com/zarazhangrui">@zarazhangrui</ExternalLink>.
+      </h1>
+      <div class="sources">
+        <ExternalLink href={resume.href}>{resume.title}</ExternalLink>
+        <ExternalLink href={coolest.href}>{coolest.title}</ExternalLink>
+      </div>
+    </section>
+
+    <section class="stats" aria-label="Collection counts">
+      <a class="stat" href="/" data-thread-link="all">
+        <span class="stat-value">{counts.total}</span>
+        <span class="stat-label">Sites</span>
+      </a>
+      <a class="stat" href="/?thread=resume" data-thread-link="resume">
+        <span class="stat-value">{counts.resume}</span>
+        <span class="stat-label">Resume thread</span>
+      </a>
+      <a class="stat" href="/?thread=coolest" data-thread-link="coolest">
+        <span class="stat-value">{counts.coolest}</span>
+        <span class="stat-label">Coolest thread</span>
+      </a>
+    </section>
+
+    <div class="toolbar">
+      <div class="filters" role="group" aria-label="Filter by source thread">
+        <button type="button" data-filter="all" aria-pressed="true">
+          All <span class="count">{counts.total}</span>
+        </button>
+        <button type="button" data-filter="resume" aria-pressed="false">
+          Resume <span class="count">{counts.resume}</span>
+        </button>
+        <button type="button" data-filter="coolest" aria-pressed="false">
+          Coolest <span class="count">{counts.coolest}</span>
+        </button>
+      </div>
+      <p id="filter-status" aria-live="polite">Showing {counts.total} sites</p>
+    </div>
+
+    <div class="grid" id="site-grid">
+      {sites.map((site) => <SiteCard site={site} />)}
+    </div>
+  </div>
+</Base>
+
+<script>
+  const buttons = document.querySelectorAll<HTMLButtonElement>("[data-filter]");
+  const links = document.querySelectorAll<HTMLAnchorElement>("[data-thread-link]");
+  const cards = document.querySelectorAll<HTMLElement>("[data-thread]");
+  const status = document.querySelector("#filter-status");
+  const known = new Set(["all", "resume", "coolest"]);
+
+  function currentFilter(): string {
+    const value = new URLSearchParams(window.location.search).get("thread") ?? "all";
+    return known.has(value) ? value : "all";
+  }
+
+  function apply(filter: string, updateUrl: boolean) {
+    let shown = 0;
+    cards.forEach((card) => {
+      const match = filter === "all" || card.dataset.thread === filter;
+      card.hidden = !match;
+      if (match) shown += 1;
+    });
+    buttons.forEach((button) => {
+      button.setAttribute("aria-pressed", button.dataset.filter === filter ? "true" : "false");
+    });
+    if (status) {
+      const noun = shown === 1 ? "site" : "sites";
+      if (filter === "resume") {
+        status.textContent = `Showing ${shown} ${noun} from the resume thread`;
+      } else if (filter === "coolest") {
+        status.textContent = `Showing ${shown} ${noun} from the coolest thread`;
+      } else {
+        status.textContent = `Showing ${shown} ${noun}`;
+      }
+    }
+    if (updateUrl) {
+      const url = new URL(window.location.href);
+      if (filter === "all") url.searchParams.delete("thread");
+      else url.searchParams.set("thread", filter);
+      history.replaceState(null, "", url);
+    }
+  }
+
+  buttons.forEach((button) => {
+    button.addEventListener("click", () => {
+      const filter = button.dataset.filter ?? "all";
+      apply(filter, true);
+    });
+  });
+
+  links.forEach((link) => {
+    link.addEventListener("click", (event) => {
+      event.preventDefault();
+      apply(link.dataset.threadLink ?? "all", true);
+    });
+  });
+
+  apply(currentFilter(), false);
+  window.addEventListener("pageshow", () => apply(currentFilter(), false));
+</script>
