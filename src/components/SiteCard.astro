@@ -1,5 +1,6 @@
 ---
-import { formatLikes, initialFor, threadFor, type Site } from "../lib/sites";
+import { formatLikes, threadFor, type Site } from "../lib/sites";
+import SitePreview from "./SitePreview.astro";
 
 interface Props {
   site: Site;
@@ -10,7 +11,7 @@ const thread = threadFor(site);
 ---
 
 <a class="card" href={`/s/${site.domain}/`} data-thread={thread.key}>
-  <div class="mark" aria-hidden="true">{initialFor(site.domain)}</div>
+  <SitePreview site={site} />
   <div class="card-body">
     <p class="domain">{site.domain}</p>
     <p class="tag">{thread.label}</p>

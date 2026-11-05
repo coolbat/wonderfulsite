@@ -6,7 +6,11 @@ WonderfulSite is a static gallery of personal websites shared in replies to two 
 - `/s/[domain]/` — domain, visit link, excerpt, reply author, source conversation, and likes
 - `/about/` — source of the list, unofficial status, and removal requests
 
-Screenshots are not included. Each card uses a letter in place of a thumbnail.
+## Previews
+
+Cards and domain pages show a screenshot of the live URL. The image is a tall WordPress mshots capture (`https://s0.wp.com/mshots/v1/{url}?w=640&h=960`), which needs no API key, so the repository does not store thumbnail files. When `public/previews/{domain}.webp` exists, that file is used instead.
+
+The homepage has 789 cards. Screenshots use `loading="lazy"` and `content-visibility` so off-screen cards do not request images up front. The preview frame pans the tall image slowly, and speeds up on hover. Motion is turned off when the visitor prefers reduced motion. If a shot fails, or mshots returns its small placeholder, the card keeps the letter mark.
 
 ## Requirements
 

@@ -1,9 +1,9 @@
 ---
 import Base from "../../layouts/Base.astro";
 import ExternalLink from "../../components/ExternalLink.astro";
+import SitePreview from "../../components/SitePreview.astro";
 import {
   formatLikes,
-  initialFor,
   replyHref,
   authorHref,
   sites,
@@ -37,7 +37,7 @@ const description = site.excerpt
       <span aria-current="page">{site.domain}</span>
     </nav>
 
-    <div class="detail-mark" aria-hidden="true">{initialFor(site.domain)}</div>
+    <SitePreview site={site} size="detail" />
     <h1>{site.domain}</h1>
     <p class="thread-line">
       {thread.label} thread · <ExternalLink href={thread.href}>{thread.title}</ExternalLink>
