@@ -19,12 +19,26 @@
     function realShot(img) {
       if (!img.naturalWidth) return false;
       if (img.getAttribute("data-kind") === "local") return true;
+      // mshots sends this GIF from /mshots/v1/default when it has no capture.
+      if (img.naturalWidth === 400 && img.naturalHeight === 300) return false;
       return img.naturalWidth >= MIN_WIDTH;
+    }
+
+    function useFallback(img) {
+      if (img.getAttribute("data-source") === "fallback") return;
+      var next = img.getAttribute("data-fallback");
+      if (!next) return;
+      img.setAttribute("data-source", "fallback");
+      img.setAttribute("src", next);
     }
 
     function scheduleRetry(img) {
       if (img.getAttribute("data-kind") === "local") return;
-      if (img.getAttribute("data-retried") === "1") return;
+      if (img.getAttribute("data-source") === "fallback") return;
+      if (img.getAttribute("data-retried") === "1") {
+        useFallback(img);
+        return;
+      }
 
       var run = function () {
         if (img.getAttribute("data-retried") === "1") return;
@@ -32,6 +46,7 @@
         var src = img.getAttribute("src");
         if (!src) return;
         window.setTimeout(function () {
+          if (img.getAttribute("data-source") === "fallback") return;
           var next = src + (src.indexOf("?") === -1 ? "?" : "&") + "v=2";
           img.setAttribute("src", next);
         }, RETRY_MS);

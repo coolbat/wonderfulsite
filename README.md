@@ -8,9 +8,14 @@ WonderfulSite is a static gallery of personal websites shared in replies to two 
 
 ## Previews
 
-Cards and domain pages show a screenshot of the live URL. The image is a tall WordPress mshots capture (`https://s0.wp.com/mshots/v1/{url}?w=640&h=960`), which needs no API key, so the repository does not store thumbnail files. When `public/previews/{domain}.webp` exists, that file is used instead.
+Cards and domain pages show a screenshot of the live URL. The first match wins:
 
-The homepage has 789 cards. Screenshots use `loading="lazy"` and `content-visibility` so off-screen cards do not request images up front. The preview frame pans the tall image slowly, and speeds up on hover. Motion is turned off when the visitor prefers reduced motion. If a shot fails, or mshots returns its small placeholder, the card keeps the letter mark.
+1. A file at `public/previews/{domain}.webp`, when one is checked in.
+2. A tall WordPress mshots capture (`https://s0.wp.com/mshots/v1/{url}?w=640&h=960`).
+3. If that request errors, or the image is the small mshots placeholder, one mshots retry and then a still thum.io capture (`https://image.thum.io/get/width/640/crop/960/noanimate/{url}`).
+4. The letter mark, when every source fails.
+
+Checked-in WebP files are for domains where mshots only returns its default placeholder. No API key is required. The homepage has 789 cards. Screenshots use `loading="lazy"` and `content-visibility` so off-screen cards do not request images up front. The preview frame pans the tall image slowly, and speeds up on hover. Motion is turned off when the visitor prefers reduced motion.
 
 ## Requirements
 
