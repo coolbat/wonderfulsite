@@ -1,6 +1,6 @@
 ---
 import { initialFor, type Site } from "../lib/sites";
-import { previewPanOffset, previewUrl } from "../lib/preview";
+import { fallbackPreviewUrl, previewPanOffset, previewUrl } from "../lib/preview";
 
 interface Props {
   site: Site;
@@ -9,6 +9,7 @@ interface Props {
 
 const { site, size = "card" } = Astro.props;
 const src = previewUrl(site.url, site.domain);
+const local = src.startsWith("/");
 const detail = size === "detail";
 const offset = previewPanOffset(site.domain);
 ---
@@ -25,7 +26,8 @@ const offset = previewPanOffset(site.domain);
       loading={detail ? "eager" : "lazy"}
       decoding="async"
       fetchpriority={detail ? "high" : "low"}
-      data-kind={src.startsWith("/") ? "local" : "remote"}
+      data-kind={local ? "local" : "remote"}
+      data-fallback={local ? undefined : fallbackPreviewUrl(site.url)}
     />
   </div>
 </div>

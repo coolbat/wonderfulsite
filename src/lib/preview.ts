@@ -28,6 +28,17 @@ export function remotePreviewUrl(url: string): string {
 }
 
 /**
+ * Second remote shot when mshots returns its placeholder or errors.
+ * No API key. `noanimate` asks for the finished still, not the loading GIF.
+ * The target is appended raw — thum.io rejects a percent-encoded URL.
+ * A fragment would be dropped by the browser, so it is removed here.
+ */
+export function fallbackPreviewUrl(url: string): string {
+  const target = url.split("#")[0];
+  return `https://image.thum.io/get/width/${MSHOTS_WIDTH}/crop/960/noanimate/${target}`;
+}
+
+/**
  * Screenshot for a site card or detail page.
  * A file at public/previews/{domain}.webp wins over the remote shot so a
  * later batch can drop images in without changing call sites.
